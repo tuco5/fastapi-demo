@@ -1,13 +1,18 @@
 from typing import Optional
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel
 
 app = FastAPI()
 
 BOOKS = [
-    {"id": 1, "title": "Title 1", "author": "Author 1", "category": "science"},
-    {"id": 2, "title": "Title 2", "author": "Author 2", "category": "science"},
-    {"id": 3, "title": "Title 3", "author": "Author 3", "category": "history"},
+    {
+        "id": 1,
+        "title": "El señor de los anillos",
+        "author": "JRR Tolkien",
+        "category": "novel",
+    },
+    {"id": 2, "title": "El hobbit", "author": "JRR Tolkien", "category": "novel"},
+    {"id": 3, "title": "Title 3", "author": "Author 3", "category": "novel"},
     {"id": 4, "title": "Title 4", "author": "Author 4", "category": "math"},
     {"id": 5, "title": "Title 5", "author": "Author 5", "category": "math"},
     {"id": 6, "title": "Title 6", "author": "Author 6", "category": "history"},
@@ -43,17 +48,24 @@ async def create_book(book: CreateBook) -> Book:
 
 
 @app.get("/books")
-async def read_all_books(category: str | None = None) -> list[Book]:
-    if not category:
-        return BOOKS
+async def read_all_books(
+    category: str | None = None, author: str | None = None
+) -> list[Book]:
+    filter_books = BOOKS.copy()
 
-    filtered_books: list[Book] = []
+    filter_books = [
+        book
+        for book in filter_books
+        if not category or category.casefold() in book["category"].casefold()
+    ]
 
-    for b in BOOKS:
-        if b["category"].casefold() == category.casefold():
-            filtered_books.append(b)
+    filter_books = [
+        book
+        for book in filter_books
+        if not author or author.casefold() in book["author"].casefold()
+    ]
 
-    return filtered_books
+    return filter_books
 
 
 @app.get("/books/{id}")
