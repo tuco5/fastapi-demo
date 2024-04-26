@@ -78,3 +78,10 @@ async def update_book_by_id(id: int, book: UpdateBook) -> Book:
             return Book(**b)
 
     raise HTTPException(status_code=404, detail="Book not found")
+
+
+@app.delete("/books/{id}")
+async def delete_book_by_id(id: int) -> None:
+    for book in BOOKS:
+        if book["id"] == id:
+            BOOKS.remove(book)
