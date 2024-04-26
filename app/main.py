@@ -77,7 +77,7 @@ async def update_book_by_id(id: int, book: UpdateBook) -> Book:
             if book.category is not None:
                 b["category"] = book.category
 
-            return Book(**b)
+            return b
 
     raise HTTPException(status_code=404, detail="Book not found")
 
