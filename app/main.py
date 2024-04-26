@@ -35,9 +35,11 @@ class Book(BaseModel):
 
 @app.post("/books")
 async def create_book(book: CreateBook) -> Book:
-    book["id"] = len(BOOKS) + 1
-    BOOKS.append(book)
-    return book
+    new_book = book.model_dump()
+    new_book["id"] = len(BOOKS) + 1
+
+    BOOKS.append(new_book)
+    return Book(**new_book)
 
 
 @app.get("/books")
@@ -78,3 +80,11 @@ async def update_book_by_id(id: int, book: UpdateBook) -> Book:
             return Book(**b)
 
     raise HTTPException(status_code=404, detail="Book not found")
+
+
+@app.delete("/books/{id}")
+async def delete_book_by_id(id: int) -> None:
+    for book in BOOKS:
+        if book["id"] == id:
+            BOOKS.remove(book)
+            return None
